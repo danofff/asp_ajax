@@ -1,0 +1,113 @@
+﻿
+@using System.Web.UI.WebControls
+@using asp_ajax.Models
+
+@model TablesViewModel
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<h1>HTML 5</h1>
+
+<label>Переключить вид:</label>
+<button id="change_view_but">Списки</button>
+
+<h3>ASP.NET MVC platform</h3>
+
+<div class="well-sm bg-info">
+    <p class="text-info">Представленный функционал реализован при помощи кривых рук программиста</p>
+</div>
+
+<div class="container">
+    <label>Y=</label>
+</div>
+
+<div class="container">
+    <textarea id="fArea" style="width: 250px;height: 150px"></textarea>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h6>Independent Variable</h6>
+        @Html.DropDownList("Independent",new SelectList(Model.Independent,"Id","Definition"),new { @class = "", @id="independ" })
+        
+    </div>
+    <div class="col-md-4">
+        <h6>Responses</h6>
+        @Html.DropDownList("Responses",new SelectList(Model.Responses,"Id","Definition"), new { @class = "", @id = "response" })
+    </div>
+    <div class="col-md-4">
+        <h6>Math Function</h6>
+        @Html.DropDownList("Match Function", new SelectList(Model.MathFunctions,"Id","Value"), new { @class = "", @id="math" })
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            //код замены выпадающего списка на множественный выбор
+            var toggleMultiple = true;
+            $("#change_view_but").on("click",
+                function () {
+
+                    if (toggleMultiple) {
+                        $("#independ").attr('multiple', 'multiple');
+                        $("#response").attr('multiple', 'multiple');
+                        $("#math").attr('multiple', 'multiple');
+                        $(this).html("Выпадашки");
+
+                    } else {
+                        $("#independ").removeAttr('multiple');
+                        $("#response").removeAttr('multiple');
+                        $("#math").removeAttr('multiple');
+                        $(this).html("Списки");
+                    }
+                    toggleMultiple = !toggleMultiple;
+                });
+            //логика выбора independent
+            $("#independ").on("change", function () {
+                var id = $(this).val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/GetIndependent',
+                    data: { id: id },
+                    success: function (data) {
+                        $("#fArea").val($("#fArea").val() + data.Value);
+                    }
+                });
+            });
+            //логика выбора responses
+            $("#response").on("change", function () {
+                var id = $(this).val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/GetResponse',
+                    data: { id: id },
+                    success: function (data) {
+                        $("#fArea").val($("#fArea").val() + data.Value);
+                    }
+                });
+            });
+
+            //логика выбора mathfunction
+            $("#math").on("change", function () {
+                var id = $(this).val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/GetMathFunction',
+                    data: { id: id },
+                    success: function (data) {
+                        $("#fArea").val($("#fArea").val() + data.Value);
+                    }
+                });
+            });
+            }
+        );
+    </script>
+
+}
